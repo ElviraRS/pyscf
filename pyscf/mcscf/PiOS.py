@@ -79,8 +79,6 @@ def Atoms_w_Coords(mol):
 
    assert(AtomCoords.shape == (mol.natm, 3))
    Elements = [mol.atom_pure_symbol(iAt) for iAt in range(mol.natm)]
-   Elements =np.asarray(Elements)
-
    return Elements,AtomCoords
 
 def MakePiOS(mol,mf,PiAtomsList, nPiOcc=None,nPiVirt=None):
@@ -103,7 +101,7 @@ def MakePiOS(mol,mf,PiAtomsList, nPiOcc=None,nPiVirt=None):
    def AssignTag(iAt, Element, Tag):
       assert(Elements[iAt-1] == Element)
       Elements[iAt-1] = Element + Tag
-  
+   Elements =np.asarray(Elements)
    
    # fix type of atom for the donor-acceptor which are exchanging the hydrogens.
    # During the process, the hydrogens are moving and the Huckel-Theory
@@ -424,7 +422,7 @@ def GetNumPiElec(iAt, Elements,Coords):
    
    # find number of bonded partners
    iBonded = []
-   for (jAt, AtJ) in len(Atoms):
+   for (jAt, AtJ) in enumerate(Elements):
       if iAt == jAt:
          continue
       rij = np.sum((Coords[At] - Coords[AtJ])**2)**.5
@@ -472,7 +470,7 @@ def MakeOverlappingOrbSubspace(Space, Name, COrb, nOrbExpected,  CTargetIb, S1, 
 
    STargetIbVir = mdot(SmhTargetIb, CTargetIb.T, S1, COrb)
    U,sig,Vt = np.linalg.svd(STargetIbVir, full_matrices=False)
-   
+   sig=np.multiply(sig,sig)
    print("    S[{},{}] singular Values (n={}, nThr={})".format(Space, Name, len(sig), nOrbExpected))
    print("    [{}]".format(', '.join('{:.4f}'.format(k) for k in sig)))
    print("    Sigma[{}]                         ".format(nOrbExpected-1), "{:.4f}".format(sig[nOrbExpected-1])," (should be 1)")
